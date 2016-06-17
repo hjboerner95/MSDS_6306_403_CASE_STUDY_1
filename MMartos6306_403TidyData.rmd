@@ -1,0 +1,349 @@
+---
+title: "Case Study 01"
+author: "Mike Martos"
+date: "June 16, 2016"
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, echo=TRUE,message=FALSE}
+library(downloader)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+```
+
+##Introduction
+
+###The GDP is probably the most used metric to describe the economic performance of a country, it shows the monetary measure of all the goods and services produced in a country or region. We intend to describe the economic performance of the countries based on the GDP rankings and Educational stats.
+
+
+###We are using the information provided by the World Bank, the Gross Domestic Product or GDP and the Education Statistics data, was last updated in April and May of 2016 respectively. We will be comparing the GDP to the education statistics.
+
+
+###We will be using R and R Studio to calculate and graph basic statistics, both are Open Source statistical tools, with a very active community of users, we will follow a reproducible methodology.
+
+###Download Raw files and load variables
+```{r pullData}
+#Download Raw files
+download("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv",destfile="./Data/Raw/gdp.csv")
+download("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FEDSTATS_Country.csv",destfile="./Data/Raw/edstats_country.csv")
+
+#load csv to variables
+rawGdp <- read.csv("./Data/Raw/gdp.csv")#, sep = ",", skip = 5, header = FALSE, )
+rawEdstats <- read.csv("./Data/Raw/edstats_country.csv")#, sep = ",", skip = 5, header = FALSE, )
+```
+
+##Clean Data
+###A set of commands that will show and summarize the information that will help clean the data.
+
+```{r cleanDataGDP}
+#Remove empty raws at the top and the bottom, and pull columns with data
+gdp <- rawGdp[5:235,c(1,2,4,5)]
+#assign column names
+names(gdp) <- c("CountryCode","ranking","country","gdp")
+
+#remove empty rows by counting number of characters in CountryCode
+gdp <- subset(gdp, nchar(as.character(CountryCode)) > 0)
+```
+
+###Check if duplicate country codes, countries and rankings
+```{r CheckDuplicates}
+table(gdp$CountryCode)[table(gdp$CountryCode)>1]
+table(gdp$country)[table(gdp$country)>1]
+table(gdp$ranking)[table(gdp$ranking)>1]
+```
+
+###From the previous commands, we find that there are two countries with the same ranking 178, St. Kitts and Nevis and Grenada
+```{r dupRankings}
+gdp[gdp$ranking == 178,]
+```
+###Remove row for world
+```{r cleanDataEDSTATS_Country}
+edstats <- subset(rawEdstats[,c(1:28)], CountryCode != 'WLD')
+```
+
+###Check if duplicate country codes
+```{r checkDuplicatesEDSTATS_Country}
+table(edstats$CountryCode)[table(edstats$CountryCode)>1]
+table(edstats$country)[table(edstats$country)>1]
+```
+
+###merge gdp and edstats into one dataframe 
+```{r cleanDataMerge}
+#We get 223 matching records
+gdpEdstats <- merge(gdp, edstats, by = "CountryCode")
+matchingRecords <- dim(gdpEdstats)[1]
+
+#Do we have duplicate rows
+gdpEdstats[duplicated(gdpEdstats[,1:31]),]
+
+#Recode columns
+gdpEdstats$Latest.population.census[gdpEdstats$Latest.population.census == "2006 (rolling)"] <- "2006"
+
+#Count number on NAs, Code generated with Excel
+sum(is.na(gdpEdstats$CountryCode))
+sum(is.na(gdpEdstats$country))
+sum(is.na(gdpEdstats$ranking))
+sum(is.na(gdpEdstats$gdp))
+sum(is.na(gdpEdstats$Long.Name))
+sum(is.na(gdpEdstats$Income.Group))
+sum(is.na(gdpEdstats$Region))
+sum(is.na(gdpEdstats$Lending.category))
+sum(is.na(gdpEdstats$Other.groups))
+sum(is.na(gdpEdstats$Currency.Unit))
+sum(is.na(gdpEdstats$Latest.population.census))
+sum(is.na(gdpEdstats$Latest.household.survey))
+sum(is.na(gdpEdstats$Special.Notes))
+sum(is.na(gdpEdstats$National.accounts.base.year))
+sum(is.na(gdpEdstats$National.accounts.reference.year))
+sum(is.na(gdpEdstats$System.of.National.Accounts))
+sum(is.na(gdpEdstats$SNA.price.valuation))
+sum(is.na(gdpEdstats$Alternative.conversion.factor))
+sum(is.na(gdpEdstats$PPP.survey.year))
+sum(is.na(gdpEdstats$Balance.of.Payments.Manual.in.use))
+sum(is.na(gdpEdstats$External.debt.Reporting.status))
+sum(is.na(gdpEdstats$System.of.trade))
+sum(is.na(gdpEdstats$Government.Accounting.concept))
+sum(is.na(gdpEdstats$IMF.data.dissemination.standard))
+sum(is.na(gdpEdstats$Source.of.most.recent.Income.and.expenditure.data))
+sum(is.na(gdpEdstats$Vital.registration.complete))
+sum(is.na(gdpEdstats$Latest.agricultural.census))
+sum(is.na(gdpEdstats$Latest.industrial.data))
+sum(is.na(gdpEdstats$Latest.trade.data))
+sum(is.na(gdpEdstats$Latest.water.withdrawal.data))
+sum(is.na(gdpEdstats$X2.alpha.code))
+
+#Make numbers look like numbers
+gdpEdstats$gdp <- str_replace_all(gdpEdstats$gdp, "[[:punct:]]", "")
+gdpEdstats$ranking <- str_replace_all(gdpEdstats$ranking, "[[:punct:]]", "")
+
+#change long name data type
+gdpEdstats$Long.Name <- as.character(gdpEdstats$Long.Name)
+
+#Remove NAs, Code generated with Excel
+gdpEdstats$CountryCode[is.na(gdpEdstats$CountryCode)] <- ""
+gdpEdstats$country[is.na(gdpEdstats$country)] <- ""
+gdpEdstats$gdp[is.na(gdpEdstats$gdp)] <- ""
+gdpEdstats$ranking[is.na(gdpEdstats$ranking)] <- ""
+gdpEdstats$Long.Name[is.na(gdpEdstats$Long.Name)] <- ""
+gdpEdstats$Income.Group[is.na(gdpEdstats$Income.Group)] <- ""
+gdpEdstats$Region[is.na(gdpEdstats$Region)] <- ""
+gdpEdstats$Lending.category[is.na(gdpEdstats$Lending.category)] <- ""
+gdpEdstats$Other.groups[is.na(gdpEdstats$Other.groups)] <- ""
+gdpEdstats$Currency.Unit[is.na(gdpEdstats$Currency.Unit)] <- ""
+gdpEdstats$Latest.population.census[is.na(gdpEdstats$Latest.population.census)] <- ""
+gdpEdstats$Latest.household.survey[is.na(gdpEdstats$Latest.household.survey)] <- ""
+gdpEdstats$Special.Notes[is.na(gdpEdstats$Special.Notes)] <- ""
+gdpEdstats$National.accounts.base.year[is.na(gdpEdstats$National.accounts.base.year)] <- ""
+gdpEdstats$National.accounts.reference.year[is.na(gdpEdstats$National.accounts.reference.year)] <- ""
+gdpEdstats$System.of.National.Accounts[is.na(gdpEdstats$System.of.National.Accounts)] <- ""
+gdpEdstats$SNA.price.valuation[is.na(gdpEdstats$SNA.price.valuation)] <- ""
+gdpEdstats$Alternative.conversion.factor[is.na(gdpEdstats$Alternative.conversion.factor)] <- ""
+gdpEdstats$PPP.survey.year[is.na(gdpEdstats$PPP.survey.year)] <- ""
+gdpEdstats$Balance.of.Payments.Manual.in.use[is.na(gdpEdstats$Balance.of.Payments.Manual.in.use)] <- ""
+gdpEdstats$External.debt.Reporting.status[is.na(gdpEdstats$External.debt.Reporting.status)] <- ""
+gdpEdstats$System.of.trade[is.na(gdpEdstats$System.of.trade)] <- ""
+gdpEdstats$Government.Accounting.concept[is.na(gdpEdstats$Government.Accounting.concept)] <- ""
+gdpEdstats$IMF.data.dissemination.standard[is.na(gdpEdstats$IMF.data.dissemination.standard)] <- ""
+gdpEdstats$Source.of.most.recent.Income.and.expenditure.data[is.na(gdpEdstats$Source.of.most.recent.Income.and.expenditure.data)] <- ""
+gdpEdstats$Vital.registration.complete[is.na(gdpEdstats$Vital.registration.complete)] <- ""
+gdpEdstats$Latest.agricultural.census[is.na(gdpEdstats$Latest.agricultural.census)] <- ""
+gdpEdstats$Latest.industrial.data[is.na(gdpEdstats$Latest.industrial.data)] <- ""
+gdpEdstats$Latest.trade.data[is.na(gdpEdstats$Latest.trade.data)] <- ""
+gdpEdstats$Latest.water.withdrawal.data[is.na(gdpEdstats$Latest.water.withdrawal.data)] <- ""
+gdpEdstats$X2.alpha.code[is.na(gdpEdstats$X2.alpha.code)] <- ""
+
+#change type of column
+gdpEdstats$gdp <- as.numeric(gdpEdstats$gdp)
+gdpEdstats$gdp[is.na(gdpEdstats$gdp)] <- 0
+gdpEdstats$ranking <- as.numeric(gdpEdstats$ranking)
+gdpEdstats$ranking[is.na(gdpEdstats$ranking)] <- 0
+gdpEdstats$CountryCode <- as.character(gdpEdstats$CountryCode)
+gdpEdstats$country <- as.character(gdpEdstats$country)
+gdpEdstats$Long.Name <- as.character(gdpEdstats$Long.Name)
+
+# Deal with Aggregate regions, create a csv file just in case and remove from working data frame
+write.csv(gdpEdstats[grep(".aggregate.", gdpEdstats$Special.Notes)[-5],], file ="./Data/AggregateRegions.csv")
+gdpEdstatsCl <- gdpEdstats[-grep(".aggregate.", gdpEdstats$Special.Notes)[-5],]
+#Remove countries with no GDP
+gdpEdstatsCl <- gdpEdstatsCl[gdpEdstatsCl$gdp > 0,]
+
+#change column names, Code generated with Excel
+names(gdpEdstatsCl)[1] <- "country.code"
+names(gdpEdstatsCl)[5] <- "long.name"
+names(gdpEdstatsCl)[6] <- "income.group"
+names(gdpEdstatsCl)[7] <- "region"
+names(gdpEdstatsCl)[8] <- "lending.category"
+names(gdpEdstatsCl)[9] <- "other.groups"
+names(gdpEdstatsCl)[10] <- "currency.unit"
+names(gdpEdstatsCl)[11] <- "latest.population.census"
+names(gdpEdstatsCl)[12] <- "latest.household.survey"
+names(gdpEdstatsCl)[13] <- "special.notes"
+names(gdpEdstatsCl)[14] <- "national.accounts.base.year"
+names(gdpEdstatsCl)[15] <- "national.accounts.reference.year"
+names(gdpEdstatsCl)[16] <- "system.of.national.accounts"
+names(gdpEdstatsCl)[17] <- "sna.price.valuation"
+names(gdpEdstatsCl)[18] <- "alternative.conversion.factor"
+names(gdpEdstatsCl)[19] <- "ppp.survey.year"
+names(gdpEdstatsCl)[20] <- "balance.of.payments.manual.in.use"
+names(gdpEdstatsCl)[21] <- "external.debt.reporting.status"
+names(gdpEdstatsCl)[22] <- "system.of.trade"
+names(gdpEdstatsCl)[23] <- "government.accounting.concept"
+names(gdpEdstatsCl)[24] <- "imf.data.dissemination.standard"
+names(gdpEdstatsCl)[25] <- "source.of.most.recent.income.and.expenditure.data"
+names(gdpEdstatsCl)[26] <- "vital.registration.complete"
+names(gdpEdstatsCl)[27] <- "latest.agricultural.census"
+names(gdpEdstatsCl)[28] <- "latest.industrial.data"
+names(gdpEdstatsCl)[29] <- "latest.trade.data"
+names(gdpEdstatsCl)[30] <- "latest.water.withdrawal.data"
+names(gdpEdstatsCl)[31] <- "country.2.code"
+
+# Save intermediate csv after cleaning
+write.csv(gdpEdstatsCl, file ="./Data/Merged01.csv")
+
+#Count each column or show an extract for the columns, Code generated with Excel
+summary(gdpEdstatsCl$country.code)
+summary(gdpEdstatsCl$country)
+summary(gdpEdstatsCl$gdp)
+summary(gdpEdstatsCl$long.name)
+summary(gdpEdstatsCl$income.group)
+summary(gdpEdstatsCl$region)
+summary(gdpEdstatsCl$lending.category)
+summary(gdpEdstatsCl$other.groups)
+head(gdpEdstatsCl$currency.unit,10)
+summary(gdpEdstatsCl$latest.population.census)
+head(gdpEdstatsCl$latest.household.survey)
+str(gdpEdstatsCl$national.accounts.base.year)
+summary(gdpEdstatsCl$national.accounts.reference.year)
+summary(gdpEdstatsCl$system.of.national.accounts)
+summary(gdpEdstatsCl$sna.price.valuation)
+summary(gdpEdstatsCl$alternative.conversion.factor)
+summary(gdpEdstatsCl$ppp.survey.year)
+summary(gdpEdstatsCl$balance.of.payments.manual.in.use)
+summary(gdpEdstatsCl$external.debt.reporting.status)
+summary(gdpEdstatsCl$system.of.trade)
+summary(gdpEdstatsCl$government.accounting.concept)
+summary(gdpEdstatsCl$imf.data.dissemination.standard)
+summary(gdpEdstatsCl$source.of.most.recent.income.and.expenditure.data)
+summary(gdpEdstatsCl$vital.registration.complete)
+summary(gdpEdstatsCl$latest.agricultural.census)
+summary(gdpEdstatsCl$latest.industrial.data)
+summary(gdpEdstatsCl$latest.trade.data)
+summary(gdpEdstatsCl$latest.water.withdrawal.data)
+head(gdpEdstatsCl$country.2.code, 20)
+```
+#Answer to Questions
+#Question 1 : Match the data based on the country shortcode. How many of the IDs match
+###The merging of the files was done earlier in the code, right after the cleaning of each individual variable (gdp, edstats), I have to note that the answer could be different, as it depends on when that merging occurs, if I remove the regional records befor the merging for example.
+``` {r Question1}
+#Match the data based on the country shortcode. How many of the IDs match
+matchingRecords
+```
+
+#Question 2	: Sort the data frame in ascending order by GDP (so United States is last). What is the 13th country in the resulting data frame?
+###The question is answered by running the *order* function, and the answer is **St. Kitts and Nevis**
+
+``` {r Questions2}
+#Sort data frame in ascending order by GDP and Country.
+gdpEdstatsClSorted <- gdpEdstatsCl[order(gdpEdstatsCl$gdp, gdpEdstatsCl$country),]
+gdpEdstatsClSorted[13,3]
+```
+
+#Question 3	: What are the average GDP rankings for the *High income: OECD* and *High income: nonOECD* groups?  
+###I broke the question in four answers, two for the Rankings and to for the actual GDP values, in addition, I'm checking if I still have zeroes, as those were introduced when dealing with missing values, and converting the variable to a number, but the zeroes are not real values and have to be removed from the mean calculation as that would affect the mean, as it is not resistant to outliers.
+
+##High income: OECD
+###This is the mean of GDP
+``` {r Questions3a1}
+hiOECD <- subset(gdpEdstatsClSorted$gdp, gdpEdstatsClSorted$income.group == "High income: OECD")
+#Do I have zeroes?
+sum(hiOECD == 0)
+#Calculate Mean
+mean(hiOECD)
+```
+###This is the mean of the rankings
+``` {r Questions3a2}
+hiOECD <- subset(gdpEdstatsClSorted$ranking, gdpEdstatsClSorted$income.group == "High income: OECD")
+#Do I have zeroes?
+sum(hiOECD == 0)
+#Calculate Mean
+mean(hiOECD)
+```
+
+##High income: nonOECD
+###This is the mean of GDP
+``` {r Questions3b1}
+#Question 3.b High income: nonOECD
+hiNoOECD <- subset(gdpEdstatsClSorted$gdp, gdpEdstatsClSorted$income.group == "High income: nonOECD")
+#Do I have zeroes?
+sum(hiNoOECD == 0)
+#Calculate Mean
+mean(hiNoOECD)
+```
+###This is the mean of the rankings
+``` {r Questions3b2}
+#Question 3.b High income: nonOECD
+hiNoOECD <- subset(gdpEdstatsClSorted$ranking, gdpEdstatsClSorted$income.group == "High income: nonOECD")
+#Do I have zeroes?
+sum(hiNoOECD == 0)
+#Calculate Mean
+mean(hiNoOECD)
+```
+
+#Question 4 Plot the GDP for all of the countries. Use ggplot2 to color your plot by Income Group
+###I tried a couple of plots and a log transformation on both, there are outliers in every group, the data is right skewed as well, and the spread of the groups is so different, that seems that the log transformation is the recommended one.
+
+``` {r Questions4Prep, include=FALSE}
+
+gdpEdstatsCl$income.group <- str_replace_all(gdpEdstatsCl$income.group, "High income: OECD", "Hi Inc: OECD")
+gdpEdstatsCl$income.group <- str_replace_all(gdpEdstatsCl$income.group, "High income: nonOECD", "Hi Inc: nonOECD")
+gdpEdstatsCl$income.group <- str_replace_all(gdpEdstatsCl$income.group, "Low income", "Low Inc")
+gdpEdstatsCl$income.group <- str_replace_all(gdpEdstatsCl$income.group, "Lower middle income", "Low Mid Inc")
+gdpEdstatsCl$income.group <- str_replace_all(gdpEdstatsCl$income.group, "Upper middle income", "Up Mid Inc")
+```
+
+``` {r Questions4}
+#Scatter plot with raw gdp
+bp1 <- ggplot(gdpEdstatsCl, aes(x=income.group, y=gdp, col=income.group))
+bp1 + geom_point()
+#Scatter plot with gdp transformed to log scale
+bp1 <- ggplot(gdpEdstatsCl, aes(x=income.group, y=log(gdp), col=income.group))
+bp1 + geom_point()
+
+#Boxplot with raw gdp
+bp <- ggplot(gdpEdstatsCl, aes(x=income.group, y=gdp, fill=income.group))
+bp + geom_boxplot() 
+#Boxplot with gdp transformed to log scale
+bp <- ggplot(gdpEdstatsCl, aes(x=income.group, y=log(gdp), fill=income.group))
+bp + geom_boxplot() 
+```
+
+#Question 5:	Cut the GDP ranking into 5 separate quantile groups. Make a table versus Income.Group. How many countries are Lower middle income but among the 38 nations with highest GDP?
+###There are 16 countries that are in the Lower Middle Income group but are part of the highest GDP group.
+
+``` {r Questions5}
+#Quantile breaks
+quantiles <- quantile(gdpEdstatsCl$ranking, probs = seq(0, 1, 0.2) )
+#Tag rows according to breaks 
+gdpEdstatsCl$quantile <- cut(gdpEdstatsCl$ranking, breaks=c(quantiles), labels=c("0-20","20-40","40-60","60-80","80-100"), include.lowest=TRUE)
+#Show table with all groups and counts
+table(gdpEdstatsCl$income.group,gdpEdstatsCl$quantile)
+
+#Filter by income group
+lmi <- gdpEdstatsCl[gdpEdstatsCl$income.group=="Low Mid Inc",]
+#Filter by ranking quantile
+lmi80_100 <- lmi[lmi$quantile=="80-100",]
+#List countries 
+lmi80_100[,3]
+```
+``` {r Finalcsv}
+# Save csv after cleaning
+write.csv(gdpEdstatsCl, file ="./Data/FinalCleaned.csv")
+```

@@ -18,7 +18,7 @@ The folders in this repository are:
 
 # Case Study 01
 Mike Martos  
-June 15, 2016  
+June 16, 2016  
 
 
 ```r

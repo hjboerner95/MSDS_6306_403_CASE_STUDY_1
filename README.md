@@ -6,11 +6,11 @@ We will be using R and R Studio to calculate and graph basic statistics, both ar
 Folder Structure:
 The folders in this repository are:
 
-Data: Holds the intermediate and final csv files after cleaning
+**Data:** Holds the intermediate and final csv files after cleaning
 
-Data\Raw: Holds the files first downloaded from the website, with no change.
+**Data\Raw:** Holds the files first downloaded from the website, with no change.
 
-Documents: Word document with the Case Study guidelines
+**Documents:** Word document with the Case Study guidelines
 
-MMartos6306_403TidyData_files: A folder created automatically by RStudio, holds the figures for the html knitted file
+**MMartos6306_403TidyData_files:** A folder created automatically by RStudio, holds the figures for the html knitted file
 

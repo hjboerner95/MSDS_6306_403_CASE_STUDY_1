@@ -1,5 +1,3 @@
-# MSDS_6306_403_CASE_STUDY_1
-
 I'm using information provided by the World Bank, the Gross Domestic Product or GDP and the Education Statistics data, was last updated in April and May of 2016 respectively. I will be comparing the GDP to the education statistics.
 
 We will be using R and R Studio to calculate and graph basic statistics, both are Open Source statistical tools, with a very active community of users, we will follow a reproducible methodology.
@@ -14,10 +12,6 @@ The folders in this repository are:
 **Documents:** Word document with the Case Study guidelines
 
 **MMartos6306_403TidyData_files:** A folder created automatically by RStudio, holds the figures for the html knitted file
-
-
-
-
 
 
 
@@ -607,210 +601,15 @@ summary(gdpEdstatsCl$other.groups)
 ```
 
 ```r
-summary(gdpEdstatsCl$currency.unit)
+head(gdpEdstatsCl$currency.unit,10)
 ```
 
 ```
-##                                    Euro 
-##                                      18 
-##                               CFA franc 
-##                                      14 
-##                             U.S. dollar 
-##                                       8 
-##                   East Caribbean dollar 
-##                                       6 
-##                       Australian dollar 
-##                                       3 
-##                          Afghan afghani 
-##                                       1 
-##                            Albanian lek 
-##                                       1 
-##                          Algerian dinar 
-##                                       1 
-##                          Angolan kwanza 
-##                                       1 
-##                          Argentine peso 
-##                                       1 
-##                           Armenian dram 
-##                                       1 
-##                           Aruban florin 
-##                                       1 
-##                         Bahamian dollar 
-##                                       1 
-##                          Bahraini dinar 
-##                                       1 
-##                        Bangladeshi taka 
-##                                       1 
-##                         Barbados dollar 
-##                                       1 
-##                        Belarusian rubel 
-##                                       1 
-##                           Belize dollar 
-##                                       1 
-##                          Bermuda dollar 
-##                                       1 
-##                      Bhutanese ngultrum 
-##                                       1 
-##                      Bolivian Boliviano 
-##                                       1 
-## Bosnia and Herzegovina convertible mark 
-##                                       1 
-##                           Botswana pula 
-##                                       1 
-##                          Brazilian real 
-##                                       1 
-##                           Brunei dollar 
-##                                       1 
-##                           Bulgarian lev 
-##                                       1 
-##                           Burundi franc 
-##                                       1 
-##                          Cambodian riel 
-##                                       1 
-##                         Canadian dollar 
-##                                       1 
-##                       Cape Verde escudo 
-##                                       1 
-##                            Chilean peso 
-##                                       1 
-##                            Chinese yuan 
-##                                       1 
-##                          Colombian peso 
-##                                       1 
-##                          Comorian franc 
-##                                       1 
-##                         Congolese franc 
-##                                       1 
-##                       Costa Rican colon 
-##                                       1 
-##                           Croatian kuna 
-##                                       1 
-##                              Cuban peso 
-##                                       1 
-##                            Czech koruna 
-##                                       1 
-##                            Danish krone 
-##                                       1 
-##                          Dominican peso 
-##                                       1 
-##                          Egyptian pound 
-##                                       1 
-##                          Eritrean nakfa 
-##                                       1 
-##                          Estonian kroon 
-##                                       1 
-##                          Ethiopian birr 
-##                                       1 
-##    Euro (data reported in Maltese liri) 
-##                                       1 
-##                           Fijian dollar 
-##                                       1 
-##                          Gambian dalasi 
-##                                       1 
-##                           Georgian lari 
-##                                       1 
-##                      Guatemalan quetzal 
-##                                       1 
-##                           Guinean franc 
-##                                       1 
-##                           Guyana dollar 
-##                                       1 
-##                          Haitian gourde 
-##                                       1 
-##                        Honduran lempira 
-##                                       1 
-##                        Hong Kong dollar 
-##                                       1 
-##                        Hungarian forint 
-##                                       1 
-##                           Iceland krona 
-##                                       1 
-##                            Indian rupee 
-##                                       1 
-##                       Indonesian rupiah 
-##                                       1 
-##                            Iranian rial 
-##                                       1 
-##                             Iraqi dinar 
-##                                       1 
-##                      Israeli new shekel 
-##                                       1 
-##                         Jamaican dollar 
-##                                       1 
-##                            Japanese yen 
-##                                       1 
-##                         Jordanian dinar 
-##                                       1 
-##                            Kazakh tenge 
-##                                       1 
-##                         Kenyan shilling 
-##                                       1 
-##                              Korean won 
-##                                       1 
-##                           Kuwaiti dinar 
-##                                       1 
-##                              Kyrgyz som 
-##                                       1 
-##                                 Lao kip 
-##                                       1 
-##                            Latvian lats 
-##                                       1 
-##                          Lebanese pound 
-##                                       1 
-##                            Lesotho loti 
-##                                       1 
-##                         Liberian dollar 
-##                                       1 
-##                        Lithuanian litas 
-##                                       1 
-##                            Macao pataca 
-##                                       1 
-##                        Macedonian denar 
-##                                       1 
-##                         Malagasy ariary 
-##                                       1 
-##                           Malawi kwacha 
-##                                       1 
-##                       Malaysian ringgit 
-##                                       1 
-##                       Maldivian rufiyaa 
-##                                       1 
-##                     Mauritanian ouguiya 
-##                                       1 
-##                         Mauritian rupee 
-##                                       1 
-##                            Mexican peso 
-##                                       1 
-##                            Moldovan leu 
-##                                       1 
-##                        Mongolian tugrik 
-##                                       1 
-##                         Moroccan dirham 
-##                                       1 
-##                         Namibian dollar 
-##                                       1 
-##                          Nepalese rupee 
-##                                       1 
-##                         New Azeri manat 
-##                                       1 
-##                       New Ghanaian cedi 
-##                                       1 
-##                  New Mozambican metical 
-##                                       1 
-##                        New Romanian leu 
-##                                       1 
-##                        New Turkish lira 
-##                                       1 
-##                       New Turkmen manat 
-##                                       1 
-##                      New Zealand dollar 
-##                                       1 
-##                 Nicaraguan gold cordoba 
-##                                       1 
-##                          Nigerian naira 
-##                                       1 
-##                                 (Other) 
-##                                      46
+##  [1] Aruban florin         Afghan afghani        Angolan kwanza       
+##  [4] Albanian lek          U.A.E. dirham         Argentine peso       
+##  [7] Armenian dram         East Caribbean dollar Australian dollar    
+## [10] Euro                 
+## 155 Levels:  Afghan afghani Albanian lek Algerian dinar ... Zimbabwe dollar
 ```
 
 ```r
@@ -833,66 +632,14 @@ summary(gdpEdstatsCl$latest.population.census)
 ```
 
 ```r
-summary(gdpEdstatsCl$latest.household.survey)
+head(gdpEdstatsCl$latest.household.survey)
 ```
 
 ```
-##                                         CPS (monthly) 
-##                         73                          1 
-##   Demographic survey, 2007                 DGHS, 2003 
-##                          1                          1 
-##                   DHS 2007                   DHS 2008 
-##                          1                          1 
-##                  DHS, 1987                  DHS, 1996 
-##                          1                          2 
-##                  DHS, 2000                  DHS, 2002 
-##                          2                          1 
-##                  DHS, 2003       DHS, 2003, SPA, 2004 
-##                          3                          1 
-##               DHS, 2003/04                  DHS, 2004 
-##                          1                          2 
-## DHS, 2004/05, AIS, 2007/08                  DHS, 2005 
-##                          1                          7 
-##    DHS, 2005, MIS, 2008-09               DHS, 2005/06 
-##                          1                          4 
-##                  DHS, 2006       DHS, 2006, SPA, 2007 
-##                          4                          1 
-##               DHS, 2006/07                  DHS, 2007 
-##                          3                          6 
-##    DHS, 2007, MIS, 2008/09               DHS, 2007/08 
-##                          1                          2 
-##                  DHS, 2008             DHS/MICS, 2006 
-##                          5                          1 
-##                 ENPF, 1995                  FHS, 1995 
-##                          1                          1 
-##                  FHS, 1996   General  household, 2005 
-##                          1                          1 
-##                 LSMS, 2003           MICS-PAPFAM 2006 
-##                          1                          1 
-##                  MICS 2005               MICS 2005/06 
-##                          1                          2 
-##                  MICS 2006                 MICS, 2000 
-##                          1                          5 
-##                 MICS, 2001   MICS, 2001, MIS, 2006/07 
-##                          1                          1 
-##                 MICS, 2003                 MICS, 2005 
-##                          1                          6 
-##              MICS, 2005-06      MICS, 2005, RHS, 2005 
-##                          1                          1 
-##              MICS, 2005/06                 MICS, 2006 
-##                          2                         21 
-##                 MICS, 2007                  MICS,2006 
-##                          1                          1 
-##                  NSS, 2007               PAPFAM, 2006 
-##                          1                          0 
-##                  RHS, 1993               RHS, 1995/96 
-##                          2                          1 
-##                  RHS, 1996                  RHS, 1999 
-##                          1                          1 
-##                  RHS, 2002                  RHS, 2004 
-##                          1                          2 
-##               RHS, 2006/07                  RHS, 2008 
-##                          1                          1
+## [1]                          MICS, 2003              
+## [3] MICS, 2001, MIS, 2006/07 MICS, 2005              
+## [5]                                                  
+## 56 Levels:  CPS (monthly) Demographic survey, 2007 DGHS, 2003 ... RHS, 2008
 ```
 
 ```r
